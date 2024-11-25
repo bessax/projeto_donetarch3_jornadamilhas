@@ -9,13 +9,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./JornadaMilhas.API/JornadaMilhas.API.csproj", "src/JornadaMilhas.API/"]
-COPY ["./JornadaMilhas.Dados/JornadaMilhas.Dados.csproj", "src/JornadaMilhas.Dados/"]
-COPY ["./JornadaMilhas.Dominio/JornadaMilhas.Dominio.csproj", "src/JornadaMilhas.Dominio/"]
-RUN dotnet restore "./src/JornadaMilhas.API/JornadaMilhas.API.csproj"
+COPY ["src/JornadaMilhas.API/JornadaMilhas.API.csproj", "src/JornadaMilhas.API/"]
+COPY ["src/JornadaMilhas.Dados/JornadaMilhas.Dados.csproj", "src/JornadaMilhas.Dados/"]
+COPY ["src/JornadaMilhas.Dominio/JornadaMilhas.Dominio.csproj", "src/JornadaMilhas.Dominio/"]
+RUN dotnet restore "./src/JornadaMilhas.API/./JornadaMilhas.API.csproj"
 COPY . .
-WORKDIR "/src/JornadaMilhas.API"
-RUN dotnet build "./JornadaMilhas.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/JornadaMilhas.API"
+RUN dotnet build "JornadaMilhas.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

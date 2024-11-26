@@ -1,5 +1,6 @@
 using JornadaMilhas.API.Endpoint;
 using JornadaMilhas.API.Service;
+using JornadaMilhas.API.Service.Interface;
 using JornadaMilhas.Dados;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
@@ -65,6 +66,8 @@ builder.Services
 builder.Services.AddCors();
 
 builder.Services.ConfigureSwaggerBearer();
+
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 var app = builder.Build();
 

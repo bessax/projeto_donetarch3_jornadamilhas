@@ -34,7 +34,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost:6379";
+    options.Configuration = "redis:6379";
 });
 
 builder.Services.AddTransient(typeof(EntityDAL<OfertaViagem>));

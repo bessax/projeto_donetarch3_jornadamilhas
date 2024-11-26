@@ -32,6 +32,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<JornadaMilhasContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+});
+
 builder.Services.AddTransient(typeof(EntityDAL<OfertaViagem>));
 builder.Services.AddTransient(typeof(EntityDAL<Rota>));
 builder.Services.AddTransient(typeof(OfertaViagemConverter));

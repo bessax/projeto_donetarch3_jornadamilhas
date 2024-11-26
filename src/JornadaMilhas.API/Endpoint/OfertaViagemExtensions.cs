@@ -1,6 +1,7 @@
 ﻿using JornadaMilhas.API.DTO.Request;
 using JornadaMilhas.API.DTO.Response;
 using JornadaMilhas.API.Service;
+using JornadaMilhas.API.Service.Interface;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ namespace JornadaMilhas.API.Endpoint;
 
 public static class OfertaViagemExtensions
 {
+    const string chaveCache = "ofertas";
     public static void AddEndPointOfertas(this WebApplication app)
     {
         app.MapPost("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemRequest ofertaReq) =>
@@ -32,16 +34,29 @@ public static class OfertaViagemExtensions
             
         }).WithTags("Oferta Viagem").WithSummary("Adiciona uma nova oferta de viagem.").WithOpenApi().RequireAuthorization();
 
-        app.MapGet("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL) =>
-        {        
-            return  Results.Ok(converter.EntityListToResponseList(await entityDAL.Listar()));
+        //Implementação de Cache
+        app.MapGet("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromServices] ICacheService cacheService) =>
+        {
+            var ofertasViagensCache = await cacheService.GetCachedDataAsync<IEnumerable<OfertaViagemResponse>>(chaveCache);
+
+            if ( ofertasViagensCache != null )
+            {
+                return Results.Ok(ofertasViagensCache);
+            }
+            var ofertasViagens = converter.EntityListToResponseList(await entityDAL.Listar());
+
+            await cacheService.SetCachedDataAsync(chaveCache, ofertasViagens, TimeSpan.FromMinutes(5));
+
+            return  Results.Ok(ofertasViagens);
+
         }).WithTags("Oferta Viagem").WithSummary("Listagem de ofertas de viagem cadastrados.").WithOpenApi().RequireAuthorization();
 
         app.MapGet("/ofertas-viagem/{id}", ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL,int id) =>
         {
-            var oferta = entityDAL.RecuperarPor(a => a.Id == id);
+            var oferta = entityDAL.RecuperarPor(a => a.Id == id);        
             if (oferta is null) return Results.NotFound();
             return Results.Ok(converter.EntityToResponse(oferta));
+
         }).WithTags("Oferta Viagem").WithSummary("Obtem oferta de viagem por id.").WithOpenApi().RequireAuthorization();
 
         app.MapDelete("/ofertas-viagem/{id}", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, int id) =>

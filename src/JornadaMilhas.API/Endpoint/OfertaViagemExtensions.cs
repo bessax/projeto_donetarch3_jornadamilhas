@@ -13,7 +13,7 @@ public static class OfertaViagemExtensions
     const string chaveCache = "ofertas";
     public static void AddEndPointOfertas(this WebApplication app)
     {
-        app.MapPost("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemRequest ofertaReq) =>
+        app.MapPost("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemRequest ofertaReq, [FromServices] ICacheService cacheService) =>
         {
             OfertaViagem oferta = new();
             try
@@ -21,7 +21,8 @@ public static class OfertaViagemExtensions
                 oferta = converter.RequestToEntity(ofertaReq);
                 if (oferta.EhValido)
                 {
-                   await entityDAL.Adicionar(oferta);
+                    await entityDAL.Adicionar(oferta);
+                    await cacheService.RemoveCachedDataAsync(chaveCache);
                     return Results.Created("Oferta criada com sucesso!", converter.EntityToResponse(oferta));
                 } 
                 throw new Exception("Oferta inválida");

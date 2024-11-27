@@ -1,10 +1,12 @@
 ﻿using JornadaMilhas.Dominio.Entidades;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace JornadaMilhas.Dados;
 public class JornadaMilhasContext : IdentityDbContext
 {
+    private readonly IConfiguration _configuration;
     public DbSet<OfertaViagem> OfertasViagem { get; set; }
     public DbSet<Rota> Rota { get; set; }
 
@@ -26,7 +28,7 @@ public class JornadaMilhasContext : IdentityDbContext
         }
         optionsBuilder
             .UseLazyLoadingProxies()
-            .UseSqlServer(connectionString);
+            .UseSqlServer(_configuration.GetConnectionString("ConnectionStrings:DefaultConnection"));
 
     }
 

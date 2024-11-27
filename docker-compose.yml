@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   jornadamilhas.api1: &app    
-    image: ${DOCKER_REGISTRY-}jornadamilhasapi
+    image: jornadamilhasacr.azurecr.io/jornadamilhasapi:app1
     build:    
       context: .
       dockerfile: src/JornadaMilhas.API/Dockerfile
@@ -16,13 +16,14 @@ services:
 
   jornadamilhas.api2:
      <<: *app
-     image: ${DOCKER_REGISTRY-}jornadamilhasapi
+     image: jornadamilhasacr.azurecr.io/jornadamilhasapi:app2
      ports:
       - '57395:8080'
       - '57396:8081'
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build: .
+    image: jornadamilhasacr.azurecr.io/jornadamilhasapi:sqlserver
     hostname: 'sqlserver'
     environment:
       ACCEPT_EULA: 'Y'
@@ -38,7 +39,8 @@ services:
       - jornadamilhas-network
 
   redis:
-    image: redis:7.2.4
+    build: .
+    image: jornadamilhasacr.azurecr.io/jornadamilhasapi:redis
     restart: unless-stopped
     networks:
       - jornadamilhas-network

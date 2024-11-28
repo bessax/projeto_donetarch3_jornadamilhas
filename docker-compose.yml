@@ -21,8 +21,7 @@ services:
       - '57395:8080'
       - '57396:8081'
 
-  sqlserver:
-    build: .
+  sqlserver:   
     image: jornadamilhasacr.azurecr.io/jornadamilhasapi:sqlserver
     hostname: 'sqlserver'
     environment:
@@ -38,8 +37,7 @@ services:
     networks:
       - jornadamilhas-network
 
-  redis:
-    build: .
+  redis: 
     image: jornadamilhasacr.azurecr.io/jornadamilhasapi:redis
     restart: unless-stopped
     networks:

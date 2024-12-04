@@ -19,6 +19,11 @@ public class CacheService : ICacheService
         return data != null ? JsonSerializer.Deserialize<T>(data) : default;
     }
 
+    public async Task RemoveCachedDataAsync(string key)
+    {
+        await cache.RemoveAsync(key);
+    }
+
     public async Task SetCachedDataAsync<T>(string key, T data, TimeSpan expiration)
     {
         var options = new DistributedCacheEntryOptions {AbsoluteExpirationRelativeToNow = expiration};

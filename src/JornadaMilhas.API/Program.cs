@@ -1,5 +1,6 @@
 using JornadaMilhas.API.Endpoint;
 using JornadaMilhas.API.Service;
+using JornadaMilhas.API.Service.Cache;
 using JornadaMilhas.Dados;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
@@ -27,6 +28,12 @@ builder.Services.AddDbContext<JornadaMilhasContext>((options) => {
                 
 });
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "redis:6379";
+});
+
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<JornadaMilhasContext>()
     .AddDefaultTokenProviders();
@@ -38,6 +45,8 @@ builder.Services.AddTransient(typeof(RotaConverter));
 builder.Services.AddTransient(typeof(PeriodoConverter));
 //Tratamento do Token
 builder.Services.AddTransient(typeof(GenerateToken));
+
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 
 builder.Services.AddEndpointsApiExplorer();

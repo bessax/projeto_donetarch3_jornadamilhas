@@ -1,16 +1,20 @@
 ﻿using JornadaMilhas.API.DTO.Request;
 using JornadaMilhas.API.DTO.Response;
 using JornadaMilhas.API.Service;
+using JornadaMilhas.API.Service.Cache;
 using JornadaMilhas.Dados.Database;
 using JornadaMilhas.Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace JornadaMilhas.API.Endpoint;
 
 public static class OfertaViagemExtensions
 {
+    const string chaveCache = "ofertas";
     public static void AddEndPointOfertas(this WebApplication app)
     {
+
         app.MapPost("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemRequest ofertaReq) =>
         {
             OfertaViagem oferta = new();
@@ -32,9 +36,19 @@ public static class OfertaViagemExtensions
             
         }).WithTags("Oferta Viagem").WithSummary("Adiciona uma nova oferta de viagem.").WithOpenApi().RequireAuthorization();
 
-        app.MapGet("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL) =>
-        {        
-            return  Results.Ok(converter.EntityListToResponseList(await entityDAL.Listar()));
+        app.MapGet("/ofertas-viagem", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromServices] ICacheService cacheService) =>
+        {
+            var ofertasViagensCache = await cacheService.GetCachedDataAsync<IEnumerable<OfertaViagemResponse>>(chaveCache);
+            if ( ofertasViagensCache != null )
+            {
+                return Results.Ok(ofertasViagensCache);
+            }
+
+            var ofertasViagens = converter.EntityListToResponseList(await entityDAL.Listar());
+
+            await cacheService.SetCachedDataAsync(chaveCache, ofertasViagens,TimeSpan.FromMinutes(5));
+
+            return  Results.Ok(ofertasViagens);
         }).WithTags("Oferta Viagem").WithSummary("Listagem de ofertas de viagem cadastrados.").WithOpenApi().RequireAuthorization();
 
         app.MapGet("/ofertas-viagem/{id}", ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL,int id) =>

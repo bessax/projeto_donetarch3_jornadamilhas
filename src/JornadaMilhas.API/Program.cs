@@ -34,6 +34,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 
+
+
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<JornadaMilhasContext>()
     .AddDefaultTokenProviders();
@@ -47,6 +50,7 @@ builder.Services.AddTransient(typeof(PeriodoConverter));
 builder.Services.AddTransient(typeof(GenerateToken));
 
 builder.Services.AddScoped<ICacheService, CacheService>();
+
 
 
 builder.Services.AddEndpointsApiExplorer();

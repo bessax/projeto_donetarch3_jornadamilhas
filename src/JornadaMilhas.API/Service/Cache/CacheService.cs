@@ -25,4 +25,6 @@ public class CacheService : ICacheService
         var serializerData = JsonSerializer.Serialize(data);
         await cache.SetStringAsync(key, serializerData, options);
     }
+
+
 }

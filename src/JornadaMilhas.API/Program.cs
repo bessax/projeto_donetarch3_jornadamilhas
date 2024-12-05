@@ -30,7 +30,7 @@ builder.Services.AddDbContext<JornadaMilhasContext>((options) => {
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "4.228.144.174";
+    options.Configuration = "redis:6379";
 });
 
 

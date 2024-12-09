@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+
 builder.Services.AddDbContext<JornadaMilhasContext>((options) => {
     options
         .UseLazyLoadingProxies()
